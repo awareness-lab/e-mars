@@ -165,6 +165,7 @@ class EdgeBaseAgent:
     def name(self, name):
         self.__name = name
 
+# WorkerAgentで使うファイル更新検知　移動，新規作成，削除，変更を検知する
 class MyHandler(FileSystemEventHandler):
     flag = True
     def _run_command(self):
@@ -191,7 +192,7 @@ class CasBaseAgent(EdgeBaseAgent):
         self.host = host
         self.topic = 'coterie-' + self.coterie
         self.local = local
-        self.status = "Alive"
+        self.status = "alive"
 
         self.file_name=file_name
 
@@ -289,13 +290,14 @@ class CasWorkerAgent(CasBaseAgent):
     }
     def __init__(self, name, file_name, dir_path="/settings", auto_load=True, local=True, coterie="Experiment", host="127.0.0.1") -> None:
         CasBaseAgent.__init__(self, name, file_name, auto_load, local, coterie, host)
+        # dir_pathで指定したディレクトリ下の監視開始
         event_handler = MyHandler()
         self.observer = Observer()
         self.observer.schedule(event_handler, os.getcwd()+dir_path, recursive=True)
         self.observer.start()
 
     def receive_message(self, msg: AgentMessage):
-        if msg.Action in self.ACTIONS and self.status == "Alive":
+        if msg.Action in self.ACTIONS and self.status == "alive":
             action_name = self.ACTIONS[msg.Action]
             try:
                 method = getattr(self, action_name)
@@ -392,15 +394,15 @@ class CasManagementAgent(CasBaseAgent):
             "Terminated":"30",
             "Disconnected":"31",
             "Restarting":"32",
-            "Sleep":"34",
-            "Alive":"37"
+            "sleep":"34",
+            "alive":"37"
         }
         symbol_paret = {
             "Terminated":"●",
             "Disconnected":"×",
             "Restarting":"○",
-            "Sleep":"-",
-            "Alive":"●"
+            "sleep":"-",
+            "alive":"●"
         }
         # ステータス表示
         print("Agents status")
